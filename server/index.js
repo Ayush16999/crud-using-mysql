@@ -5,7 +5,6 @@ const cors = require('cors');
 const app = express();
 const axios = require('axios');
 const mysql = require('mysql2');
-const serverless = require('serverless-http');
 
 const db = mysql.createConnection({
     host: process.env.DATABASE_HOST,
@@ -95,7 +94,3 @@ app.post('/employees', (req, res) => {
 app.get('/', (req, res) => {
     res.json(`Welcome to backend`);
 });
-
-
-
-module.exports.handler = serverless(app);
