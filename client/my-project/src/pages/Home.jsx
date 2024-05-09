@@ -21,9 +21,13 @@ const Home = () => {
     }
   }
 
+
+  
   useEffect(() => {
     getEmployees();
   }, []);
+
+
 
   if (loading) {
     return <Loader />;

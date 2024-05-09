@@ -5,7 +5,7 @@ const cors = require('cors');
 const app = express();
 const axios = require('axios');
 const mysql = require('mysql2');
-
+const serverless = require('serverless-http');
 
 const db = mysql.createConnection({
     host: process.env.DATABASE_HOST,
@@ -22,11 +22,6 @@ app.use(cors({
 }));
 app.use(express.json())
 app.use(express.query())
-
-
-app.listen(9000, async () => {
-    console.log(`Server started at port: 9000`);
-});
 
 
 db.connect((err) => {
@@ -71,7 +66,7 @@ app.post('/api/createTable', (req, res) => {
 
 
 
-app.get('/employees', (req, res) => {
+app.get('/api/employees', (req, res) => {
     const data = "SELECT * FROM vahan_assignment.employees"
     db.query(data, (err, items) => {
         if (err) return res.json(err)
@@ -80,7 +75,7 @@ app.get('/employees', (req, res) => {
 });
 
 
-app.post('/employees', (req, res) => {
+app.post('/api/employees', (req, res) => {
     const query = "INSERT INTO vahan_assignment.employees (`name`, `phone`, `email`, `dob`, `desc`, `department` ) VALUES (?)"
     const values = ["Alone Clone", "743425435", "alone123@gmail.com", "2000/09/02", "Hello guys i am under the water", "Developers"]
 
@@ -92,7 +87,10 @@ app.post('/employees', (req, res) => {
 });
 
 
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
     res.json(`Welcome to backend`);
 });
 
+
+
+module.exports.handler = serverless(app);
