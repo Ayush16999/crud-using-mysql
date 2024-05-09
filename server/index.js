@@ -4,29 +4,95 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const axios = require('axios');
-const mysql = require('mysql');
+const mysql = require('mysql2');
+
+
 const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "Ayush@123",
-    database: "vahan_assignment"
+    host: process.env.DATABASE_HOST,
+    user: process.env.DATABASE_USERNAME,
+    port: process.env.DATABASE_PORT,
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE
 })
 
 
-//middleware
+
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:5173']
+    origin: ['http://localhost:5173']
 }));
 app.use(express.json())
 app.use(express.query())
-//middleware
 
 
 app.listen(9000, async () => {
     console.log(`Server started at port: 9000`);
 });
 
+
+db.connect((err) => {
+    if (err) {
+        console.error('Error connecting to MySQL database:', err);
+        return;
+    }
+    console.log('Connected to MySQL database');
+});
+
+
+
+
+app.post('/api/createTable', (req, res) => {
+    const { tableName, columns } = req.body;
+
+    let createQuery = `CREATE TABLE ${tableName} (`;
+    columns.forEach((column, index) => {
+        const { name, dataType, primaryKey, autoIncrement, defaultValue } = column;
+        createQuery += `${name} ${dataType}`;
+        if (primaryKey) {
+            createQuery += ' PRIMARY KEY';
+            if (autoIncrement) {
+                createQuery += ' AUTO_INCREMENT';
+            }
+        }
+        if (defaultValue) {
+            createQuery += ` DEFAULT ${defaultValue}`;
+        }
+        createQuery += index !== columns.length - 1 ? ', ' : '';
+    });
+    createQuery += ')';
+
+    db.query(createQuery, (err, result) => {
+        if (err) {
+            console.error('Error creating table:', err);
+            return res.status(500).json({ error: 'Failed to create table' });
+        }
+        return res.status(201).json({ message: 'Table created successfully' });
+    });
+});
+
+
+
+app.get('/employees', (req, res) => {
+    const data = "SELECT * FROM vahan_assignment.employees"
+    db.query(data, (err, items) => {
+        if (err) return res.json(err)
+        return res.json(items)
+    })
+});
+
+
+app.post('/employees', (req, res) => {
+    const query = "INSERT INTO vahan_assignment.employees (`name`, `phone`, `email`, `dob`, `desc`, `department` ) VALUES (?)"
+    const values = ["Alone Clone", "743425435", "alone123@gmail.com", "2000/09/02", "Hello guys i am under the water", "Developers"]
+
+    db.query(query, [values], (err, result) => {
+        if (err) return res.json(err)
+        return res.json({ message: "New Row Created Successfully" })
+    })
+
+});
+
+
 app.get('/', (req, res) => {
- res.json(`Welcome to backend`);
+    res.json(`Welcome to backend`);
 });
 
