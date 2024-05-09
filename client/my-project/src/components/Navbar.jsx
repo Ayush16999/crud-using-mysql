@@ -1,7 +1,10 @@
 import React from "react";
 import { Button } from "./ui/button";
+import { useProvider } from "@/context/Provider";
 
 const Navbar = () => {
+  const { name } = useProvider();
+
   return (
     <div className="flex justify-between items-center py-4">
       <div>
