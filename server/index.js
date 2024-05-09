@@ -4,6 +4,14 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const axios = require('axios');
+const mysql = require('mysql');
+const db = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "Ayush@123",
+    database: "vahan_assignment"
+})
+
 
 //middleware
 app.use(cors({
@@ -14,13 +22,11 @@ app.use(express.query())
 //middleware
 
 
-
-
 app.listen(9000, async () => {
     console.log(`Server started at port: 9000`);
 });
 
-app.get('/api', (req, res) => {
-    return res.send(`<p>Hello, This is the united mega race API page</p>`);
+app.get('/', (req, res) => {
+ res.json(`Welcome to backend`);
 });
 
