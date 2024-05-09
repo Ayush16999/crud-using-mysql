@@ -24,6 +24,11 @@ app.use(express.json())
 app.use(express.query())
 
 
+app.listen(9000, async () => {
+    console.log(`Server started at port: 9000`);
+});
+
+
 db.connect((err) => {
     if (err) {
         console.error('Error connecting to MySQL database:', err);
@@ -66,7 +71,7 @@ app.post('/api/createTable', (req, res) => {
 
 
 
-app.get('/api/employees', (req, res) => {
+app.get('/employees', (req, res) => {
     const data = "SELECT * FROM vahan_assignment.employees"
     db.query(data, (err, items) => {
         if (err) return res.json(err)
@@ -75,7 +80,7 @@ app.get('/api/employees', (req, res) => {
 });
 
 
-app.post('/api/employees', (req, res) => {
+app.post('/employees', (req, res) => {
     const query = "INSERT INTO vahan_assignment.employees (`name`, `phone`, `email`, `dob`, `desc`, `department` ) VALUES (?)"
     const values = ["Alone Clone", "743425435", "alone123@gmail.com", "2000/09/02", "Hello guys i am under the water", "Developers"]
 
@@ -87,7 +92,7 @@ app.post('/api/employees', (req, res) => {
 });
 
 
-app.get('/api', (req, res) => {
+app.get('/', (req, res) => {
     res.json(`Welcome to backend`);
 });
 
