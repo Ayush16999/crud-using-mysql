@@ -14,6 +14,8 @@ app.use(express.query())
 //middleware
 
 
+
+
 app.listen(9000, async () => {
     console.log(`Server started at port: 9000`);
 });
