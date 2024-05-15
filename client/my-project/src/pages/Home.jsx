@@ -1,19 +1,23 @@
 import Loader from "@/components/Loader";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const [loading, setLoading] = useState(false);
   const [entitys, setEntitys] = useState([]);
 
+  const navigate = useNavigate();
+
   async function getEmployees() {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_DOMAIN}/employees`
+        `${import.meta.env.VITE_BACKEND_DOMAIN}/api/tables`
       );
       const data = response.data;
       setEntitys(data);
+      console.log(data);
     } catch (error) {
       console.log(error);
     } finally {
@@ -21,13 +25,9 @@ const Home = () => {
     }
   }
 
-
-  
   useEffect(() => {
     getEmployees();
   }, []);
-
-
 
   if (loading) {
     return <Loader />;
@@ -37,13 +37,16 @@ const Home = () => {
     <>
       {entitys.length > 0 ? (
         <div className="grid grid-cols-3 place-items-center gap-y-20 w-full">
-          {entitys.map((entity) => {
+          {entitys.map((entity, ind) => {
             return (
               <div
-                key={entity._id}
+                key={ind}
+                onClick={() =>
+                  navigate(`/collection/${entity.Tables_in_vahan_assignment}`)
+                }
                 className="w-96 h-60 flex items-center justify-center text-3xl uppercase bg-gray-100 rounded-3xl cursor-pointer shadow-2xl hover:scale-95 transition-all duration-100"
               >
-                {entity.name}
+                {entity.Tables_in_vahan_assignment}
               </div>
             );
           })}

@@ -37,45 +37,95 @@ db.connect((err) => {
 });
 
 
+// Endpoint to get column definitions for a specific table
+app.get('/api/tables/:tableName/columns', (req, res) => {
+    const { tableName } = req.params;
 
+    const query = `
+      SELECT COLUMN_NAME, DATA_TYPE
+      FROM INFORMATION_SCHEMA.COLUMNS
+      WHERE TABLE_NAME = '${tableName}'
+    `;
 
-app.post('/api/createTable', (req, res) => {
-    const { tableName, columns } = req.body;
-
-    let createQuery = `CREATE TABLE ${tableName} (`;
-    columns.forEach((column, index) => {
-        const { name, dataType, primaryKey, autoIncrement, defaultValue } = column;
-        createQuery += `${name} ${dataType}`;
-        if (primaryKey) {
-            createQuery += ' PRIMARY KEY';
-            if (autoIncrement) {
-                createQuery += ' AUTO_INCREMENT';
-            }
-        }
-        if (defaultValue) {
-            createQuery += ` DEFAULT ${defaultValue}`;
-        }
-        createQuery += index !== columns.length - 1 ? ', ' : '';
-    });
-    createQuery += ')';
-
-    db.query(createQuery, (err, result) => {
+    db.query(query, (err, results) => {
         if (err) {
-            console.error('Error creating table:', err);
-            return res.status(500).json({ error: 'Failed to create table' });
+            console.error('Error fetching column definitions:', err);
+            return res.status(500).json({ message: 'Failed to fetch column definitions' });
         }
-        return res.status(201).json({ message: 'Table created successfully' });
+        res.json(results);
+    });
+});
+
+
+// Add a row to a specific table endpoint
+app.post('/api/tables/:tableName/add', (req, res) => {
+    const { tableName } = req.params;
+    const newRow = req.body;
+    console.log((newRow));
+    const columns = Object.keys(newRow).map(col => `\`${col}\``).join(', ');
+    const values = Object.values(newRow).map(value => `'${value}'`).join(', ');
+
+    const query = `INSERT INTO \`${tableName}\` (${columns}) VALUES (${values})`;
+
+    db.query(query, (err, result) => {
+        if (err) {
+            console.error('Error adding row to table:', err);
+            return res.status(500).json({ message: 'Failed to add row to table' });
+        }
+        res.json({ message: 'Row added successfully' });
     });
 });
 
 
 
-app.get('/employees', (req, res) => {
-    const data = "SELECT * FROM vahan_assignment.employees"
-    db.query(data, (err, items) => {
-        if (err) return res.json(err)
-        return res.json(items)
-    })
+// Create table endpoint
+app.post('/api/createTable', (req, res) => {
+    const { tableName, columns } = req.body;
+
+    console.log(tableName, columns);
+
+    // Construct columns SQL with default value
+    const columnsSql = columns.map(column => {
+        const defaultValueSql = column.defaultValue ? `DEFAULT '${column.defaultValue}'` : '';
+        return `${column.name} ${column.dataType} ${defaultValueSql}`;
+    }).join(', ');
+
+    // Add id column with primary key and auto increment
+    const createTableSql = `
+        CREATE TABLE ${tableName} (
+            _id INT AUTO_INCREMENT PRIMARY KEY,
+            ${columnsSql}
+        )
+    `;
+
+    db.query(createTableSql, (err, result) => {
+        if (err) {
+            console.error('Error creating table:', err);
+            return res.status(500).json({ error: 'Error creating table' });
+        }
+        res.status(201).json({ message: 'Table created successfully' });
+    });
+});
+
+
+// Get all tables endpoint
+app.get('/api/tables', (req, res) => {
+    const query = "SHOW TABLES";
+    db.query(query, (err, tables) => {
+        if (err) return res.status(500).json(err);
+        return res.json(tables);
+    });
+});
+
+
+
+app.get('/api/tables/:tableName', (req, res) => {
+    const { tableName } = req.params;
+    const query = `SELECT * FROM ${tableName}`;
+    db.query(query, (err, data) => {
+        if (err) return res.status(500).json(err);
+        return res.json(data);
+    });
 });
 
 
@@ -89,6 +139,7 @@ app.post('/employees', (req, res) => {
     })
 
 });
+
 
 
 app.get('/', (req, res) => {
