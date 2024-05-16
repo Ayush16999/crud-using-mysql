@@ -41,19 +41,37 @@ const CreateNewRow = () => {
   }, [collectionName]);
 
   const handleInputChange = (e) => {
-    setNewRow({
-      ...newRow,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value, files } = e.target;
+    if (files) {
+      setNewRow({
+        ...newRow,
+        [name]: files[0],
+      });
+    } else {
+      setNewRow({
+        ...newRow,
+        [name]: value,
+      });
+    }
   };
 
   const handleAddRow = async () => {
+    const formData = new FormData();
+    for (const key in newRow) {
+      formData.append(key, newRow[key]);
+    }
+
     try {
       await axios.post(
         `${
           import.meta.env.VITE_BACKEND_DOMAIN
         }/api/tables/${collectionName}/add`,
-        newRow
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
       setNewRow({});
       navigate(-1);
@@ -100,9 +118,14 @@ const CreateNewRow = () => {
               <Input
                 type={getInputType(col.DATA_TYPE)}
                 name={col.COLUMN_NAME}
-                value={newRow[col.COLUMN_NAME] || ""}
+                value={
+                  col.DATA_TYPE.includes("blob")
+                    ? undefined
+                    : newRow[col.COLUMN_NAME] || ""
+                }
                 onChange={handleInputChange}
                 placeholder={`Enter ${col.COLUMN_NAME}`}
+                {...(col.DATA_TYPE.includes("blob") && { accept: "image/*" })}
               />
             </div>
           ))}

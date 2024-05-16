@@ -4,6 +4,8 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const axios = require('axios');
+const multer = require('multer');
+const path = require('path');
 const mysql = require('mysql2');
 
 const db = mysql.createConnection({
@@ -14,6 +16,17 @@ const db = mysql.createConnection({
     database: process.env.DATABASE
 })
 
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/'); // Destination directory
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + '-' + file.originalname); // Generate unique filename
+    }
+});
+
+const upload = multer({ storage: storage });
 
 
 app.use(cors({
@@ -21,6 +34,7 @@ app.use(cors({
 }));
 app.use(express.json())
 app.use(express.query())
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 app.listen(9000, async () => {
@@ -57,11 +71,15 @@ app.get('/api/tables/:tableName/columns', (req, res) => {
 });
 
 
-// Add a row to a specific table endpoint
-app.post('/api/tables/:tableName/add', (req, res) => {
+app.post('/api/tables/:tableName/add', upload.any(), (req, res) => {
     const { tableName } = req.params;
     const newRow = req.body;
-    console.log((newRow));
+
+    // Handle file fields
+    req.files.forEach(file => {
+        newRow[file.fieldname] = file.path;
+    });
+
     const columns = Object.keys(newRow).map(col => `\`${col}\``).join(', ');
     const values = Object.values(newRow).map(value => `'${value}'`).join(', ');
 
@@ -75,7 +93,6 @@ app.post('/api/tables/:tableName/add', (req, res) => {
         res.json({ message: 'Row added successfully' });
     });
 });
-
 
 
 // Create table endpoint
@@ -121,12 +138,36 @@ app.get('/api/tables', (req, res) => {
 
 app.get('/api/tables/:tableName', (req, res) => {
     const { tableName } = req.params;
-    const query = `SELECT * FROM ${tableName}`;
-    db.query(query, (err, data) => {
+
+    // Query to get column types
+    const columnQuery = `SHOW COLUMNS FROM ${tableName}`;
+
+    db.query(columnQuery, (err, columns) => {
         if (err) return res.status(500).json(err);
-        return res.json(data);
+
+        // Fetching the actual data from the table
+        const dataQuery = `SELECT * FROM ${tableName}`;
+        db.query(dataQuery, (err, data) => {
+            if (err) return res.status(500).json(err);
+
+            // Transform the BLOB fields to URLs
+            const transformedData = data.map(row => {
+                columns.forEach(col => {
+                    if (col.Type.includes('blob')) {
+                        if (row[col.Field]) {
+                            row[col.Field] = row[col.Field].toString('utf-8'); // Convert buffer to string
+                            row[col.Field] = path.join('/uploads', row[col.Field].slice(7)); // Create URL
+                        }
+                    }
+                });
+                return row;
+            });
+
+            return res.json(transformedData);
+        });
     });
 });
+
 
 
 app.post('/employees', (req, res) => {
