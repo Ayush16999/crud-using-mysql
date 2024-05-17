@@ -34,7 +34,7 @@ const exec = util.promisify(require('child_process').exec);
 
 
 app.use(cors({
-    origin: ['http://localhost:5173']
+    origin: ['http://localhost:5173', 'https://scrap-builder.vercel.app/']
 }));
 app.use(express.json())
 app.use(express.query())
