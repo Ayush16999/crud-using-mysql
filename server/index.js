@@ -107,7 +107,11 @@ app.post('/api/tables/:tableName/add', upload.any(), async (req, res) => {
 
     const query = `INSERT INTO \`${tableName}\` (${columns}) VALUES (${values})`;
 
+
+    
     console.log('Constructed query:', query);
+
+
 
     try {
         db.query(query, (err, result) => {
