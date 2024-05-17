@@ -74,7 +74,7 @@ const TableDetails = () => {
     }
 
     // Base URL for media files
-    const baseUrl = "http://localhost:9000";
+    const baseUrl = import.meta.env.VITE_BACKEND_DOMAIN;
 
     // Check if the cell data is an image URL
     if (
