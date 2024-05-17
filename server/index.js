@@ -89,9 +89,13 @@ app.get('/api/tables/:tableName/columns', (req, res) => {
 });
 
 
-app.post('/api/tables/:tableName/add', upload.any(), (req, res) => {
+app.post('/api/tables/:tableName/add', upload.any(), async (req, res) => {
     const { tableName } = req.params;
     const newRow = req.body;
+
+    console.log('Request received for table:', tableName);
+    console.log('Request body:', newRow);
+    console.log('Files:', req.files);
 
     // Handle file fields
     req.files.forEach(file => {
@@ -103,19 +107,29 @@ app.post('/api/tables/:tableName/add', upload.any(), (req, res) => {
 
     const query = `INSERT INTO \`${tableName}\` (${columns}) VALUES (${values})`;
 
-    console.log('Executing query:', query);
+    console.log('Constructed query:', query);
 
-    db.query(query, (err, result) => {
-        if (err) {
-            console.error('Error adding row to table:', err);
-            return res.status(500).json({ 
-                message: 'Failed to add row to table', 
-                error: err.message,
-                stack: err.stack
-            });
-        }
-        res.json({ message: 'Row added successfully', result });
-    });
+    try {
+        db.query(query, (err, result) => {
+            if (err) {
+                console.error('Error adding row to table:', err);
+                return res.status(500).json({ 
+                    message: 'Failed to add row to table', 
+                    error: err.message,
+                    stack: err.stack
+                });
+            }
+            console.log('Row added successfully:', result);
+            res.json({ message: 'Row added successfully', result });
+        });
+    } catch (error) {
+        console.error('Unexpected error:', error);
+        return res.status(500).json({ 
+            message: 'Unexpected error occurred', 
+            error: error.message,
+            stack: error.stack
+        });
+    }
 });
 
 // Create table endpoint
