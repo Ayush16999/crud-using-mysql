@@ -41,10 +41,6 @@ app.use(express.query())
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
-app.listen(9000, async () => {
-    console.log(`Server started at port: 9000`);
-});
-
 
 db.connect((err) => {
     if (err) {
