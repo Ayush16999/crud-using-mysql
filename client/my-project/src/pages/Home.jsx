@@ -2,6 +2,7 @@ import Loader from "@/components/Loader";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
@@ -29,18 +30,15 @@ const Home = () => {
   useEffect(() => {
     getEmployees();
   }, []);
-  
-  
+
   useEffect(() => {
     deleteTable();
   }, [entitys]);
 
-
-
-
   const deleteTable = (tableName) => {
     setLoading(true);
-    axios.delete(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/tables/${tableName}`)
+    axios
+      .delete(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/tables/${tableName}`)
       .then(() => {
         setEntitys(
           entitys.filter(
