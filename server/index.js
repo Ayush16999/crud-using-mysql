@@ -1,9 +1,7 @@
 require('dotenv').config();
-const http = require('http');
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const axios = require('axios');
 const multer = require('multer');
 const path = require('path');
 const mysql = require('mysql2');
@@ -35,10 +33,14 @@ const exec = util.promisify(require('child_process').exec);
 
 //middleware
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:5173', 'https://scrap-builder.vercel.app']
+    origin: ['http://localhost:3000', 'http://localhost:5173', 'https://scrap-builder.vercel.app'],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+    optionsSuccessStatus: 204
 }));
 app.use(express.json())
 app.use(express.query())
+app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
@@ -213,5 +215,7 @@ app.get('/api/tables/:tableName', (req, res) => {
 app.get('/', (req, res) => {
     res.json(`Welcome to backend`);
 });
+
+
 
 module.exports = app;

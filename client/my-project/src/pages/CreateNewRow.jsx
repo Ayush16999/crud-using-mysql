@@ -79,7 +79,7 @@ const CreateNewRow = () => {
       navigate(-1);
     } catch (error) {
       console.log(error);
-      toast.success("Error in adding row");
+      toast.error("Error in adding row");
     }
   };
 
