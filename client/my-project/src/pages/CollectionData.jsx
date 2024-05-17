@@ -10,7 +10,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 
 const TableDetails = () => {
   const { collectionName } = useParams();
@@ -156,6 +155,9 @@ const TableDetails = () => {
     return cellData.toString(); // Convert other types to string
   };
 
+
+  
+
   useEffect(() => {
     fetchTableDetails();
   }, [collectionName]);
@@ -167,15 +169,16 @@ const TableDetails = () => {
   return (
     <div className="container mx-auto">
       <h1 className="text-4xl font-bold capitalize py-4">
-        {collectionName} Collection Data
+        {collectionName} Collection
       </h1>
       <Table className="w-full my-10 border rounded-3xl p-10">
         <TableHeader>
           <TableRow className="text-sm">
-            {rows.length >= 1 &&
+            {rows.length >= 1 && (
               <TableHead className="uppercase font-bold text-center">
-              Edit
-            </TableHead>}
+                Edit
+              </TableHead>
+            )}
             {columns.map((col) => (
               <TableHead
                 className="uppercase font-bold text-center"

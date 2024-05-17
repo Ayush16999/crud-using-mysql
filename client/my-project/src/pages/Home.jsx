@@ -28,13 +28,19 @@ const Home = () => {
 
   useEffect(() => {
     getEmployees();
-    deleteTable();
   }, []);
+  
+  
+  useEffect(() => {
+    deleteTable();
+  }, [entitys]);
+
+
+
 
   const deleteTable = (tableName) => {
     setLoading(true);
-    axios
-      .delete(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/tables/${tableName}`)
+    axios.delete(`${import.meta.env.VITE_BACKEND_DOMAIN}/api/tables/${tableName}`)
       .then(() => {
         setEntitys(
           entitys.filter(
@@ -44,7 +50,6 @@ const Home = () => {
         toast.success("Collection Deleted Successfully!");
       })
       .catch((error) => {
-        console.error("Error deleting table:", error);
         toast.error("Error: Cannot delete table");
       })
       .finally(() => {
@@ -59,7 +64,7 @@ const Home = () => {
   return (
     <>
       <p className="text-center mb-10 uppercase underline">
-        To Open a collection double click
+        double click To Open a collection
       </p>
       <h1 className="text-2xl font-bold mb-10">ALL COLLECTIONS ARE BELOW:-</h1>
       {entitys.length > 0 ? (

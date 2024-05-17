@@ -5,6 +5,7 @@ import Loader from "@/components/Loader"; // Assuming you have a Loader componen
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import toast from "react-hot-toast";
 
 const CreateNewRow = () => {
   const { collectionName } = useParams();
@@ -73,10 +74,12 @@ const CreateNewRow = () => {
           },
         }
       );
+      toast.success("Row Added Successfully!");
       setNewRow({});
       navigate(-1);
     } catch (error) {
       console.log(error);
+      toast.success("Error in adding row");
     }
   };
 
