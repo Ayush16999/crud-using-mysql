@@ -103,17 +103,20 @@ app.post('/api/tables/:tableName/add', upload.any(), (req, res) => {
 
     const query = `INSERT INTO \`${tableName}\` (${columns}) VALUES (${values})`;
 
-    console.log(query);
+    console.log('Executing query:', query);
 
     db.query(query, (err, result) => {
         if (err) {
             console.error('Error adding row to table:', err);
-            return res.status(500).json({ message: 'Failed to add row to table' });
+            return res.status(500).json({ 
+                message: 'Failed to add row to table', 
+                error: err.message,
+                stack: err.stack
+            });
         }
-        res.json({ message: 'Row added successfully' });
+        res.json({ message: 'Row added successfully', result });
     });
 });
-
 
 // Create table endpoint
 app.post('/api/createTable', (req, res) => {
