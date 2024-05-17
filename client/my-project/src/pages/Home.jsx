@@ -31,10 +31,6 @@ const Home = () => {
     getEmployees();
   }, []);
 
-  useEffect(() => {
-    deleteTable();
-  }, [entitys]);
-
   const deleteTable = (tableName) => {
     setLoading(true);
     axios
@@ -62,9 +58,9 @@ const Home = () => {
   return (
     <>
       <p className="text-center mb-10 uppercase underline">
-        double click To Open a collection
+        Double click to open a collection
       </p>
-      <h1 className="text-2xl font-bold mb-10">ALL COLLECTIONS ARE BELOW:-</h1>
+      <h1 className="text-2xl font-bold mb-10">ALL COLLECTIONS ARE BELOW:</h1>
       {entitys.length > 0 ? (
         <div className="grid grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1 place-items-center gap-10 w-full">
           {entitys.map((entity, ind) => {
@@ -77,11 +73,13 @@ const Home = () => {
                 className="w-full relative px-10 h-fit py-20 flex items-center justify-center text-3xl uppercase bg-gray-100 rounded-3xl border-4 shadow-2xl transition-all duration-100"
               >
                 {entity.Tables_in_vahan_assignment}
-                <span className="bg-red-600 w-10 h-10 border absolute cursor-pointer z-20 -bottom-10 right-0 p-2 rounded-full">
+                <span
+                  className="bg-red-600 w-10 h-10 border absolute cursor-pointer z-20 -bottom-10 right-0 p-2 rounded-full"
+                  onClick={() =>
+                    deleteTable(entity.Tables_in_vahan_assignment)
+                  }
+                >
                   <svg
-                    onClick={() =>
-                      deleteTable(entity.Tables_in_vahan_assignment)
-                    }
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -96,13 +94,15 @@ const Home = () => {
                     />
                   </svg>
                 </span>
-                <span className="bg-yellow-600 absolute cursor-pointer z-20 -bottom-10 left-0 p-2 rounded-full">
+                <span
+                  className="bg-yellow-600 absolute cursor-pointer z-20 -bottom-10 left-0 p-2 rounded-full"
+                  onClick={() =>
+                    navigate(
+                      `/update/collection/${entity.Tables_in_vahan_assignment}`
+                    )
+                  }
+                >
                   <svg
-                    onClick={() =>
-                      navigate(
-                        `/update/collection/${entity.Tables_in_vahan_assignment}`
-                      )
-                    }
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -137,7 +137,7 @@ const Home = () => {
               d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
             />
           </svg>
-          <p>No Data Founds</p>
+          <p>No Data Found</p>
         </div>
       )}
     </>
