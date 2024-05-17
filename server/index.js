@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const multer = require('multer');
+const fs = require('fs');
 const path = require('path');
 const mysql = require('mysql2');
 const util = require('util');
@@ -14,6 +15,14 @@ const db = mysql.createConnection({
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE
 })
+
+
+const uploadsDir = path.join(__dirname, 'uploads');
+
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
+
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
