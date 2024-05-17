@@ -172,9 +172,10 @@ const TableDetails = () => {
       <Table className="w-full my-10 border rounded-3xl p-10">
         <TableHeader>
           <TableRow className="text-sm">
-            <TableHead className="uppercase font-bold text-center">
+            {rows.length >= 1 &&
+              <TableHead className="uppercase font-bold text-center">
               Edit
-            </TableHead>
+            </TableHead>}
             {columns.map((col) => (
               <TableHead
                 className="uppercase font-bold text-center"
