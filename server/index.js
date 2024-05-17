@@ -41,7 +41,9 @@ app.use(express.query())
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
-app.listen(9000, async () => {
+const port = process.env.PORT || 9000;
+
+app.listen(port, async () => {
     console.log(`Server started at port: 9000`);
 });
 
