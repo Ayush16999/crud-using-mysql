@@ -7,6 +7,7 @@ const axios = require('axios');
 const multer = require('multer');
 const path = require('path');
 const mysql = require('mysql2');
+const util = require('util');
 
 const db = mysql.createConnection({
     host: process.env.DATABASE_HOST,
@@ -27,6 +28,9 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
+
+const exec = util.promisify(require('child_process').exec);
+
 
 
 app.use(cors({
@@ -85,6 +89,8 @@ app.post('/api/tables/:tableName/add', upload.any(), (req, res) => {
 
     const query = `INSERT INTO \`${tableName}\` (${columns}) VALUES (${values})`;
 
+    console.log(query);
+
     db.query(query, (err, result) => {
         if (err) {
             console.error('Error adding row to table:', err);
@@ -136,6 +142,37 @@ app.get('/api/tables', (req, res) => {
 
 
 
+// Delete table endpoint
+app.delete('/api/tables/:tableName', (req, res) => {
+    const { tableName } = req.params;
+    const query = `DROP TABLE ??`; // Use parameterized query to avoid SQL injection
+    db.query(query, [tableName], (err, result) => {
+        if (err) return res.status(500).json(err);
+        return res.json({ message: `Table ${tableName} deleted successfully` });
+    });
+});
+
+
+
+// Update table name endpoint
+app.put('/api/tables/update', async (req, res) => {
+    const { oldName, newName } = req.body;
+    if (!oldName || !newName) {
+        return res.status(400).json({ error: 'Missing oldName or newName in request body' });
+    }
+
+    try {
+        const query = `ALTER TABLE \`${oldName}\` RENAME TO \`${newName}\``;
+        db.query(query);
+        return res.json({ message: `Table name updated from ${oldName} to ${newName}` });
+    } catch (error) {
+        console.error('Error updating table name:', error);
+        return res.status(500).json({ error: 'Error updating table name' });
+    }
+});
+
+
+
 app.get('/api/tables/:tableName', (req, res) => {
     const { tableName } = req.params;
 
@@ -166,19 +203,6 @@ app.get('/api/tables/:tableName', (req, res) => {
             return res.json(transformedData);
         });
     });
-});
-
-
-
-app.post('/employees', (req, res) => {
-    const query = "INSERT INTO vahan_assignment.employees (`name`, `phone`, `email`, `dob`, `desc`, `department` ) VALUES (?)"
-    const values = ["Alone Clone", "743425435", "alone123@gmail.com", "2000/09/02", "Hello guys i am under the water", "Developers"]
-
-    db.query(query, [values], (err, result) => {
-        if (err) return res.json(err)
-        return res.json({ message: "New Row Created Successfully" })
-    })
-
 });
 
 

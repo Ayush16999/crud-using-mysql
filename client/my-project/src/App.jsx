@@ -5,6 +5,7 @@ import CreateNewRow from "./pages/CreateNewRow";
 import ErrorPage from "./pages/ErrorPage";
 import Home from "./pages/Home";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import UpdateCollection from "./pages/UpdateCollection";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <hr className="pb-10" />
         <Routes>
           <Route path="/" Component={Home} />
+          <Route path="/update/collection/:name" Component={UpdateCollection} />
           <Route path="*" Component={ErrorPage} />
           <Route
             path="/collection/:collectionName"

@@ -82,7 +82,7 @@ const CreateNewRow = () => {
 
   const getInputType = (dataType) => {
     switch (dataType) {
-      case "int":
+      case "bigint":
         return "number";
       case "varchar(255)":
       case "TEXT":

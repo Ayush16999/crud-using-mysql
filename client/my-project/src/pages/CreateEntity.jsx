@@ -20,6 +20,8 @@ const CreateEntity = () => {
   const [message, setMessage] = useState("");
   const [tables, setTables] = useState([]);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     // Fetch all tables on component mount
     axios
@@ -34,6 +36,11 @@ const CreateEntity = () => {
 
   const addColumn = () => {
     setColumns([...columns, { name: "", dataType: "", defaultValue: "" }]);
+  };
+
+  const deleteColumn = (index) => {
+    const updatedColumns = columns.filter((_, colIndex) => colIndex !== index);
+    setColumns(updatedColumns);
   };
 
   const handleColumnChange = (index, key, value) => {
@@ -55,29 +62,27 @@ const CreateEntity = () => {
     // Validate column names
     for (const column of columns) {
       if (column.name.length < 3) {
-        setTableName("");
-        setColumns([{ name: "", dataType: "", defaultValue: "" }]);
         toast.error("Error: Enter minimum 3 characters for column name");
         return;
       }
     }
 
     try {
-      const response = await axios.post(
+      await axios.post(
         `${import.meta.env.VITE_BACKEND_DOMAIN}/api/createTable`,
         { tableName, columns }
       );
-      setMessage(response.data.message);
       toast.success("New Entity Created Successfully!");
+      navigate("/");
     } catch (error) {
-      setMessage("Failed to create table");
+      console.log(error);
       toast.error("Error: Cannot Create New Entity");
     }
   };
 
   return (
     <div className="max-w-screen-sm mx-auto min-h-[60vh] flex flex-col justify-around border-4 bg-black/10 p-10 rounded-3xl">
-      <h1 className="text-3xl font-bold text-center my-4">
+      <h1 className="text-3xl max-sm:text-xl font-bold text-center my-4">
         Create New Collection
       </h1>
       <div>
@@ -86,12 +91,12 @@ const CreateEntity = () => {
             type="text"
             value={tableName.replace(/_/g, " ")} // Show spaces in the input field
             onChange={(e) => handleTableNameChange(e.target.value)}
-            className="h-14"
-            placeholder="Enter table name"
+            className="h-14 border max-sm:h-12"
+            placeholder="Enter Collection name"
             description=""
             required
           />
-          <span className="text-xs   px-2">
+          <span className="text-xs px-2">
             Enter table name minimum 3 characters
           </span>
         </div>
@@ -100,42 +105,49 @@ const CreateEntity = () => {
             key={index}
             className="flex items-center w-full flex-col space-x-2 my-4"
           >
-            <div className="flex items-center justify-start w-full">
-              <span className="mr-2">{index + 1}</span>
-              <Input
-                type="text"
-                value={column.name.replace(/_/g, " ")}
-                onChange={(e) =>
-                  handleColumnChange(index, "name", e.target.value)
-                }
-                className="h-12 mr-2"
-                placeholder="Column name"
-              />
+            <div className="flex items-center max-sm:flex-wrap justify-start max-sm:justify-end w-full">
+              <div className="flex items-center w-full">
+                <span className="mr-2">{index + 1}</span>
+                <Input
+                  type="text"
+                  value={column.name.replace(/_/g, " ")}
+                  onChange={(e) =>
+                    handleColumnChange(index, "name", e.target.value)
+                  }
+                  className="h-12 max-sm:h-10 mr-2 max-sm:mr-0"
+                  placeholder="Column name"
+                />
+              </div>
               <Select
                 defaultValue={column.dataType}
                 onValueChange={(value) =>
                   handleColumnChange(index, "dataType", value)
                 }
               >
-                <SelectTrigger className="w-[150px] h-12 bg-indigo-600 text-white">
+                <SelectTrigger className="w-24 h-12 max-sm:h-10 bg-indigo-600 text-white">
                   <SelectValue placeholder="Type" />
                 </SelectTrigger>
                 <SelectContent className="bg-indigo-600 text-white">
-                  <SelectItem value="INT">Number</SelectItem>
+                  <SelectItem value="BIGINT">Number</SelectItem>
                   <SelectItem value="VARCHAR(255)">String</SelectItem>
                   <SelectItem value="BOOLEAN">Boolean</SelectItem>
                   <SelectItem value="TEXT">Text</SelectItem>
+
                   <SelectItem value="DATE">Date</SelectItem>
                   <SelectItem value="BLOB">Image</SelectItem>
                   <SelectItem value="MEDIUMBLOB">Audio</SelectItem>
                   <SelectItem value="LONGBLOB">Video</SelectItem>
-                  {/* Add more data types as needed */}
                 </SelectContent>
               </Select>
+              {index > 0 && (
+                <Button
+                  className="ml-2 h-12 bg-red-600"
+                  onClick={() => deleteColumn(index)}
+                >
+                  Delete
+                </Button>
+              )}
             </div>
-            <p className="text-xs  px-4 w-full">
-              Enter column name minimum 3 characters
-            </p>
           </div>
         ))}
         <Button className="float-end bg-green-700 mb-4" onClick={addColumn}>
