@@ -34,15 +34,16 @@ const exec = util.promisify(require('child_process').exec);
 
 
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://scrap-builder.vercel.app/'],
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow these HTTP methods
-    credentials: true, // Enable if you need to pass cookies or authentication
-    optionsSuccessStatus: 204 // Some legacy browsers (IE11, various SmartTVs) choke on 204
+    origin: ['http://localhost:5173', 'https://scrap-builder.vercel.app/']
 }));
 app.use(express.json())
 app.use(express.query())
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+
+app.listen(9000, async () => {
+    console.log(`Server started at port: 9000`);
+});
 
 
 db.connect((err) => {
@@ -209,3 +210,5 @@ app.get('/api/tables/:tableName', (req, res) => {
 app.get('/', (req, res) => {
     res.json(`Welcome to backend`);
 });
+
+module.exports = app;
