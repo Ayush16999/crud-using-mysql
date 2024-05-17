@@ -155,9 +155,6 @@ const TableDetails = () => {
     return cellData.toString(); // Convert other types to string
   };
 
-
-  
-
   useEffect(() => {
     fetchTableDetails();
   }, [collectionName]);

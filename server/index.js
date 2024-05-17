@@ -20,7 +20,7 @@ const db = mysql.createConnection({
 const uploadsDir = path.join(__dirname, 'uploads');
 
 if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir);
+    fs.mkdirSync(uploadsDir);
 }
 
 
@@ -218,6 +218,9 @@ app.get('/api/tables/:tableName', (req, res) => {
         });
     });
 });
+
+
+
 
 
 
